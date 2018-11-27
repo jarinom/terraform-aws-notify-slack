@@ -35,6 +35,31 @@ def cloudwatch_notification(message, region):
             ]
         }
 
+def autoscaling_notification(message, region):
+    states = {
+            'autoscaling:EC2_INSTANCE_LAUNCH': 'warning',
+            'autoscaling:EC2_INSTANCE_TERMINATE': 'warning',
+            'autoscaling:EC2_INSTANCE_LAUNCH_ERROR': 'danger',
+            'autoscaling:EC2_INSTANCE_TERMINATE_ERROR': 'danger',
+            'autoscaling:TEST_NOTIFICATION': 'good',
+        }
+
+    return {
+            "color": states[message['Event']],
+            "fallback": message['Description'],
+            "fields": [
+                { "title": "Autoscaling group", "value": message['AutoScalingGroupName'], "short": False },
+                { "title": "Event description", "value": message['Description'], "short": False},
+                { "title": "Event cause", "value": message['Cause'], "short": False},
+                { "title": "Status code", "value": message['StatusCode'], "short": True },
+                { "title": "Status message", "value": message['StatusMessage'], "short": True },
+                {
+                    "title": "Link to Alarm",
+                    "value": "https://console.aws.amazon.com/ec2/autoscaling/home?region=" + region + "#AutoScalingGroups:id=" + urllib.parse.quote_plus(message['AutoScalingGroupName']) + ";view=history;I_F=;SH_F=" + urllib.parse.quote_plus(message['EC2InstanceId']),
+                    "short": False
+                }
+            ]
+        }
 
 def default_notification(message):
     return {
@@ -62,6 +87,10 @@ def notify_slack(message, region):
     if "AlarmName" in message:
         notification = cloudwatch_notification(message, region)
         payload['text'] = "AWS CloudWatch notification - " + message["AlarmName"]
+        payload['attachments'].append(notification)
+    if "Event" in message and message["Event"].startswith("autoscaling:"):
+        notification = autoscaling_notification(message, region)
+        payload['text'] = "AWS Autoscaling notification - " + message["AutoScalingGroupName"]
         payload['attachments'].append(notification)
     else:
         payload['text'] = "AWS notification"
