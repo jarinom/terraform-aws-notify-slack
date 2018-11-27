@@ -12,6 +12,7 @@ Start by setting up an [incoming webhook integration](https://my.slack.com/servi
 - [x] Most of Slack message options are customizable
 - [x] Support different types of SNS messages:
   - [x] AWS Cloudwatch
+  - [x] EC2 Auto Scaling Group notification
   - [ ] [Send pull-request to add support of other message types](https://github.com/terraform-aws-modules/terraform-aws-notify-slack/pulls)
 
 ## Usage
