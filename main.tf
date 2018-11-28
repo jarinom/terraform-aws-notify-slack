@@ -77,7 +77,7 @@ resource "aws_lambda_function" "notify_slack" {
 
   lifecycle {
     ignore_changes = [
-      "filename",
+      #"filename",
       "last_modified",
     ]
   }
