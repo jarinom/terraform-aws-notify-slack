@@ -88,7 +88,7 @@ def notify_slack(message, region):
         notification = cloudwatch_notification(message, region)
         payload['text'] = "AWS CloudWatch notification - " + message["AlarmName"]
         payload['attachments'].append(notification)
-    if "Event" in message and message["Event"].startswith("autoscaling:"):
+    elif "Event" in message and message["Event"].startswith("autoscaling:"):
         notification = autoscaling_notification(message, region)
         payload['text'] = "AWS Autoscaling notification - " + message["AutoScalingGroupName"]
         payload['attachments'].append(notification)
